@@ -1,0 +1,22 @@
+{
+  "name": "simple-versioner",
+  "version": "0.0.1",
+  "description": "Create version based on data from the build",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hvdb/simple-versioner.git"
+  },
+  "keywords": [
+    "azure-pipelines"
+  ],
+  "author": "Henk van den Brink",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hvdb/simple-versioner/issues"
+  },
+  "homepage": "https://github.com/hvdb/simple-versioner#readme"
+}
