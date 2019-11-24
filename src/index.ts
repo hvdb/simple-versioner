@@ -8,16 +8,16 @@ interface Arguments {
 
 const simpleVersioner = (args: Arguments): void => {
   const { buildEnvironment } = args;
-  const version = createVersion();
+  const packageJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json')).toString());
 
+  const version = createVersion(packageJson);
+
+  updatePackageJson(version, packageJson);
   updateBuildnumberOnAzure(version);
-
 };
 
-const createVersion = (): string => {
+const createVersion = (packageJson: any): string => {
   // get version from package.json
-  const packageJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json')).toString());
-  console.log('vers ', packageJson.version);
 
   // check if pr
   const buildReason: string = process.env.BUILD_REASON || '';
@@ -39,6 +39,11 @@ const createVersion = (): string => {
   }
 
   return correctVersion;
+}
+
+const updatePackageJson = (version: string, packageJson: any): void => {
+  packageJson.version = version;
+  fs.writeFileSync(path.join(process.cwd(), 'package.json'), JSON.stringify(packageJson, null, 4));
 }
 
 const updateBuildnumberOnAzure = (version: string): void => {
