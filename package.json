@@ -1,6 +1,6 @@
 {
   "name": "simple-versioner",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Create version based on data from the build",
   "bin": "./bin/index.js",
   "main": "./bin/index.js",
