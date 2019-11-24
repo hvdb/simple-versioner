@@ -20,6 +20,10 @@ steps:
   displayName: 'npm install'
   
 - script: |
+    npm run build
+  displayName: 'npm build'
+    
+- script: |
     npm pack
   displayName: 'Package for npm release'
 
