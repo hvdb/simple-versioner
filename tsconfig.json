@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "lib": ["es6", "es2015"],
+    "types": ["node"],
+    "declaration": true,
+    "outDir": "lib",
+    "rootDir": "src",
+    "strict": true,
+  },
+  "exclude": [
+    "lib",
+    "node_modules",
+    "src/**/*.spec.ts",
+    "bin"
+  ],
+  "include": [
+    "src"
+  ]
+}

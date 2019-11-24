@@ -1,11 +1,14 @@
 {
   "name": "simple-versioner",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "Create version based on data from the build",
-  "bin": "./bin/index.js",
-  "main": "./bin/index.js",
+  "bin": "./lib/bin.js",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "build:check": "tsc --noEmit"
   },
   "repository": {
     "type": "git",
@@ -19,5 +22,14 @@
   "bugs": {
     "url": "https://github.com/hvdb/simple-versioner/issues"
   },
-  "homepage": "https://github.com/hvdb/simple-versioner#readme"
+  "homepage": "https://github.com/hvdb/simple-versioner#readme",
+  "files": [
+    "bin",
+    "lib"
+  ],
+  "devDependencies": {
+    "@types/node": "^12.12.12",
+    "ts-node": "^8.5.2",
+    "typescript": "^3.7.2"
+  }
 }
