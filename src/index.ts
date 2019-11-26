@@ -2,24 +2,19 @@
 import fs from 'fs';
 import path from 'path';
 
-interface Arguments {
-  buildEnvironment: string;
-}
 
-const simpleVersioner = (args: Arguments): void => {
-  const { buildEnvironment } = args;
+const simpleVersioner = (): string => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json')).toString());
 
   const version = createVersion(packageJson);
 
   updatePackageJson(version, packageJson);
   updateBuildnumberOnAzure(version);
+  return version;
 };
 
 const createVersion = (packageJson: any): string => {
-  // get version from package.json
-
-  // check if pr
+  // Get all the needed data
   const buildReason: string = process.env.BUILD_REASON || '';
   let sourceBranch: string = process.env.BUILD_SOURCEBRANCH || '';
   let gitCommitHash: string = process.env.BUILD_SOURCEVERSION || '';
@@ -32,9 +27,9 @@ const createVersion = (packageJson: any): string => {
   const gitSha = gitCommitHash.slice(0, 8);
   let correctVersion = packageJson.version;
   // if master use defined version.
-  // otherwise crwated one based on branch and sha
+  // otherwise create one based on branch and sha
   if (sourceBranch !== 'refs/heads/master') {
-    let correctedSourceBranch = sourceBranch.replace(/\//g, "_");
+    let correctedSourceBranch = sourceBranch.replace(/\//g, "-");
     correctVersion = `${packageJson.version}-${correctedSourceBranch}-${gitSha}`
   }
 
