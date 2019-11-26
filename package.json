@@ -1,6 +1,6 @@
 {
   "name": "simple-versioner",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Create version based on data from the build",
   "bin": "./lib/bin.js",
   "main": "./lib/index.js",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://hvdb.visualstudio.com/DefaultCollection/simple-versioner/_git/simple-versioner"
+    "url": "git+https://github.com/hvdb/simple-versioner.git"
   },
   "keywords": [
     "azure-pipelines"
@@ -20,9 +20,9 @@
   "author": "Henk van den Brink",
   "license": "MIT",
   "bugs": {
-    "url": "https://hvdb.visualstudio.com/simple-versioner/_workitems/recentlyupdated/"
+    "url": "https://github.com/hvdb/simple-versioner/issues"
   },
-  "homepage": "https://hvdb.visualstudio.com/_git/simple-versioner?path=%2FREADME.md&_a=preview",
+  "homepage": "https://github.com/hvdb/simple-versioner#readme",
   "files": [
     "bin",
     "lib"
