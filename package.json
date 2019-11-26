@@ -1,12 +1,12 @@
 {
   "name": "simple-versioner",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Create version based on data from the build",
   "bin": "./lib/bin.js",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "tsc",
     "build:check": "tsc --noEmit"
   },
@@ -28,7 +28,10 @@
     "lib"
   ],
   "devDependencies": {
+    "@types/jest": "^24.0.23",
     "@types/node": "^12.12.12",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.2.0",
     "ts-node": "^8.5.2",
     "typescript": "^3.7.2"
   }
