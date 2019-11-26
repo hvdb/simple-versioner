@@ -22,6 +22,9 @@ steps:
 - script: |
     npm test
   displayName: 'npm test'  
+ 
+- bash: 'npx simple-versioner'
+  displayName: 'Get and set correct build version'
   
 - script: |
     npm run build
