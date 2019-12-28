@@ -1,49 +1,40 @@
-import path from 'path';
-import fs from 'fs';
+jest.mock('fs');
+
 import simpleVersioner from './index';
+const spy = jest.spyOn(console, 'log');
 
 
-test('Should give back the normal version as build was for master', () => {
-    const currentCWD = process.cwd();
-    process.chdir(path.join(currentCWD, 'mocks', 'master'));
+const setup = (buildReason: string, sourceBranch: string, sourceVersion: string, version: string) => {
+    require('fs').__setMockFile(JSON.stringify({ version }));
 
-    process.env.BUILD_REASON = 'Ci Individual';
-    process.env.BUILD_SOURCEBRANCH = 'refs/heads/master';
-    process.env.BUILD_SOURCEVERSION = '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397';
+    process.env.BUILD_REASON = buildReason;
+    process.env.BUILD_SOURCEBRANCH = sourceBranch;
+    process.env.BUILD_SOURCEVERSION = sourceVersion;
+}
 
-    const result = simpleVersioner();
-    expect(result).toBe('1.0.0');
-    process.chdir(path.join(currentCWD));
-
-    // remove env
+const tearDown = () => {
     delete process.env.BUILD_REASON;
     delete process.env.BUILD_SOURCEBRANCH;
     delete process.env.BUILD_SOURCEVERSION;
+    jest.restoreAllMocks();
+}
+
+afterEach(() => {
+    tearDown();
+});
+
+test('Should give back the normal version as build was for master', () => {
+    setup('Ci Individual', 'refs/heads/master', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397', '1.0.0');
+
+    const result = simpleVersioner();
+    expect(result).toBe('1.0.0');
+    expect(spy).toHaveBeenCalledWith("##vso[build.updatebuildnumber]1.0.0");
 });
 
 
 test('Should give back a version for develop branch', () => {
-    const currentCWD = process.cwd();
-    process.chdir(path.join(currentCWD, 'mocks', 'develop'));
-
-    process.env.BUILD_REASON = 'Ci Individual';
-    process.env.BUILD_SOURCEBRANCH = 'refs/heads/develop';
-    process.env.BUILD_SOURCEVERSION = '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397';
+    setup('Ci Individual', 'refs/heads/develop', '1d2abf44a3b28c5f4385d95b9f3fe83a1af94397', '1.0.1');
 
     const result = simpleVersioner();
-    expect(result).toBe('1.0.1-refs-heads-develop-1c2abf44');
-    const pkgJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json')).toString());
-
-    expect(pkgJson.version).toBe('1.0.1-refs-heads-develop-1c2abf44');
-
-    // remove env
-
-    pkgJson.version = '1.0.1';
-    fs.writeFileSync(path.join(process.cwd(), 'package.json'), JSON.stringify(pkgJson, null, 4));
-    delete process.env.BUILD_REASON;
-    delete process.env.BUILD_SOURCEBRANCH;
-    delete process.env.BUILD_SOURCEVERSION;
-    process.chdir(path.join(currentCWD));
-
-
+    expect(result).toBe('1.0.1-refs-heads-develop-1d2abf44');
 });

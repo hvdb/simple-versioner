@@ -19,6 +19,6 @@
     "bin"
   ],
   "include": [
-    "src"
+    "src", "src/__mocks__"
   ]
 }

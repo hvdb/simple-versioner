@@ -1,38 +1,38 @@
 {
-  "name": "simple-versioner",
-  "version": "0.0.11",
-  "description": "Create version based on data from the build",
-  "bin": "./lib/bin.js",
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
-  "scripts": {
-    "test": "jest",
-    "build": "tsc",
-    "build:check": "tsc --noEmit"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hvdb/simple-versioner.git"
-  },
-  "keywords": [
-    "azure-pipelines"
-  ],
-  "author": "Henk van den Brink",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/hvdb/simple-versioner/issues"
-  },
-  "homepage": "https://github.com/hvdb/simple-versioner#readme",
-  "files": [
-    "bin",
-    "lib"
-  ],
-  "devDependencies": {
-    "@types/jest": "^24.0.23",
-    "@types/node": "^12.12.12",
-    "jest": "^24.9.0",
-    "ts-jest": "^24.2.0",
-    "ts-node": "^8.5.2",
-    "typescript": "^3.7.2"
-  }
+    "name": "simple-versioner",
+    "version": "0.0.11",
+    "description": "Create version based on data from the build",
+    "bin": "./lib/bin.js",
+    "main": "./lib/index.js",
+    "types": "./lib/index.d.ts",
+    "scripts": {
+        "test": "jest",
+        "build": "tsc",
+        "build:check": "tsc --noEmit"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/hvdb/simple-versioner.git"
+    },
+    "keywords": [
+        "azure-pipelines"
+    ],
+    "author": "Henk van den Brink",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/hvdb/simple-versioner/issues"
+    },
+    "homepage": "https://github.com/hvdb/simple-versioner#readme",
+    "files": [
+        "bin",
+        "lib"
+    ],
+    "devDependencies": {
+        "@types/jest": "^24.0.23",
+        "@types/node": "^12.12.12",
+        "jest": "^24.9.0",
+        "ts-jest": "^24.2.0",
+        "ts-node": "^8.5.2",
+        "typescript": "^3.7.2"
+    }
 }

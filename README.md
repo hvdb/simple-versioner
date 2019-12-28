@@ -20,19 +20,6 @@ or install
 `npm i simple-versioner`
 `simple-versioner`
 
-## How it works
-
-If the build is for master, the version would be left as is and the `Build.buildnumber` will be update to that version. The build name will then be changed to that version instead of existing one.
-
-When it is a feature branch:
-- version: 1.0.0
-- branch: develop
-- gitCommitSha = 7bea27af4e3095bf77701a4e8dc71e9a53140b55
-
-Version send to Azure, and put into the `package.json` is `1.0.0-refs-heads-develop-7bea27af`
-
-PR's are also handled and the correct branch and commitHash is used.
-
 ### Adding to build pipeline
 
 #### Editor
@@ -51,6 +38,20 @@ npx simple-versioner
 - bash: 'npx simple-versioner'
   displayName: 'Get and set correct build version'
 ```
+
+## How it works
+
+If the build is for master, the version would be left as is and the `Build.Buildnumber` will be update to that version. The build name will then be changed to that version instead of existing name.
+
+When it is a feature branch:
+- version: 1.0.0
+- branch: develop
+- gitCommitSha = 7bea27af4e3095bf77701a4e8dc71e9a53140b55
+
+Version send to Azure, and put into the `package.json` is `1.0.0-refs-heads-develop-7bea27af`
+
+PR's are also handled and the correct branch and commitHash is used.
+
 
 ## Contributing
 
