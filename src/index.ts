@@ -1,14 +1,24 @@
-#!/usr/bin/env node
 import fs from 'fs';
 import path from 'path';
-
+import tagExists from './git';
 
 const simpleVersioner = (): string => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json')).toString());
 
+  // Create version based on Azure system variable
   const version = createVersion(packageJson);
 
+  // Check if version is already released (tag exists)
+  if (tagExists(version)) {
+    console.log('tsag ')
+    console.log('##vso[task.complete result=Failed;]DONE');
+    // Exit with a non success code as we should not release.
+    throw new Error(`Version ${version} is already released, please update package.json to a newer version`);
+  }
+  console.log('hjhjhjh')
+  // Update the package.json with the new version
   updatePackageJson(version, packageJson);
+  // Update Azure devops BuildNumber with the new version.
   updateBuildnumberOnAzure(version);
   return version;
 };
