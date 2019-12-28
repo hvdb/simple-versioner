@@ -10,12 +10,9 @@ const simpleVersioner = (): string => {
 
   // Check if version is already released (tag exists)
   if (tagExists(version)) {
-    console.log('tsag ')
-    console.log('##vso[task.complete result=Failed;]DONE');
     // Exit with a non success code as we should not release.
     throw new Error(`Version ${version} is already released, please update package.json to a newer version`);
   }
-  console.log('hjhjhjh')
   // Update the package.json with the new version
   updatePackageJson(version, packageJson);
   // Update Azure devops BuildNumber with the new version.

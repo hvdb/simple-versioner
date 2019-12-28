@@ -45,7 +45,5 @@ test('Should fail because tag already exists', () => {
         simpleVersioner();
     } catch (exception) {
         expect(exception.message).toBe('Version 0.0.1 is already released, please update package.json to a newer version');
-        expect(spy).toHaveBeenCalledWith("##vso[task.complete result=Failed;]DONE");
-
     }
 });
