@@ -52,6 +52,7 @@ Version send to Azure, and put into the `package.json` is `1.0.0-refs-heads-deve
 
 PR's are also handled and the correct branch and commitHash is used.
 
+It will also validate if there is a git tag available for the given version, if that is the case the task will fail.
 
 ## Contributing
 
@@ -67,5 +68,5 @@ Tests can be executed by running `npm t`
 - More options
 - More tests
 - Ability to use it for more then Azure DevOps
-- Lot's more
+- What else?
 
