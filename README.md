@@ -20,6 +20,12 @@ or install
 `npm i simple-versioner`
 `simple-versioner`
 
+### Other file then package.json
+
+`npx simple-versioner vss-extension.json`
+
+Disclaimer: only works on files that also have a field named version
+
 ### Adding to build pipeline
 
 #### Editor

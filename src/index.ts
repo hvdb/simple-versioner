@@ -3,10 +3,17 @@ import path from 'path';
 import tagExists from './git';
 
 const simpleVersioner = (): string => {
-  const packageJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json')).toString());
+  let jsonFilePath;
+  if(process.argv.length > 2) {
+    jsonFilePath = path.join(process.cwd(), process.argv[2])
+  } else {
+    jsonFilePath = path.join(process.cwd(), 'package.json');
+  }
+  
+  const jsonFile = JSON.parse(fs.readFileSync(jsonFilePath).toString());
 
   // Create version based on Azure system variable
-  const version = createVersion(packageJson);
+  const version = createVersion(jsonFile);
 
   // Check if version is already released (tag exists)
   if (tagExists(version)) {
@@ -14,7 +21,7 @@ const simpleVersioner = (): string => {
     throw new Error(`Version ${version} is already released, please update package.json to a newer version`);
   }
   // Update the package.json with the new version
-  updatePackageJson(version, packageJson);
+  updateJson(version, jsonFile, jsonFilePath);
   // Update Azure devops BuildNumber with the new version.
   updateBuildnumberOnAzure(version);
   return version;
@@ -43,9 +50,9 @@ const createVersion = (packageJson: any): string => {
   return correctVersion;
 }
 
-const updatePackageJson = (version: string, packageJson: any): void => {
-  packageJson.version = version;
-  fs.writeFileSync(path.join(process.cwd(), 'package.json'), JSON.stringify(packageJson, null, 4));
+const updateJson = (version: string, jsonFile: any, filePath: string): void => {
+  jsonFile.version = version;
+  fs.writeFileSync(filePath, JSON.stringify(jsonFile, null, 4));
 }
 
 const updateBuildnumberOnAzure = (version: string): void => {
