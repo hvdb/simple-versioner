@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.0 [2021-08-11]
+### Added
+- Option to specify stable branch if you want to use a different branch then master
+
 ## 0.0.14 [2020-01-04]
 ### Added
 - Option for other file with same format (for version) as package.json
