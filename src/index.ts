@@ -2,32 +2,67 @@ import fs from 'fs';
 import path from 'path';
 import tagExists from './git';
 
-const simpleVersioner = (): string => {
-  let jsonFilePath;
-  if(process.argv.length > 2) {
-    jsonFilePath = path.join(process.cwd(), process.argv[2])
-  } else {
-    jsonFilePath = path.join(process.cwd(), 'package.json');
+const STABLE_BRANCH_NAME = 'master';
+const STABLE_BRANCH_REFERENCE = 'refs/heads/';
+const FILE_TO_VERSION = 'package.json';
+
+interface Parameters {
+  fileToVersion: string;
+  stableBranch: string;
+}
+
+/**
+ * Handle parameters provided.
+ * 
+ * @returns {Parameters} Object containing the file to version and stable branch
+ */
+const handleParameters = (): Parameters => {
+  let fileToVersion: string = FILE_TO_VERSION;
+  let stableBranch: string = STABLE_BRANCH_REFERENCE + STABLE_BRANCH_NAME;
+  if (process.argv.length > 2) {
+    // There are parameters passed, no check what they are.
+    // File passed to version
+    let passedFile = process.argv.find(param => param.includes(".json")) as string;
+    if (passedFile) {
+      fileToVersion = passedFile;
+    }
+
+    // Different stable branch passed
+    let passedBranch = process.argv.find(param => param.includes("-b:")) as string;
+    if (passedBranch) {
+      stableBranch = STABLE_BRANCH_REFERENCE + passedBranch.replace('-b:', '');
+    }
   }
-  
+
+  return {
+    fileToVersion,
+    stableBranch,
+  }
+}
+
+const simpleVersioner = (): string => {
+  let { fileToVersion, stableBranch } = handleParameters();
+
+  let jsonFilePath = path.join(process.cwd(), fileToVersion);
   const jsonFile = JSON.parse(fs.readFileSync(jsonFilePath).toString());
 
+
   // Create version based on Azure system variable
-  const version = createVersion(jsonFile);
+  const version = createVersion(jsonFile, stableBranch);
 
   // Check if version is already released (tag exists)
   if (tagExists(version)) {
     // Exit with a non success code as we should not release.
-    throw new Error(`Version ${version} is already released, please update package.json to a newer version`);
+    throw new Error(`Version ${version} is already released, please update ${fileToVersion} to a newer version`);
   }
-  // Update the package.json with the new version
+  // Update the filetoversion with the new version
   updateJson(version, jsonFile, jsonFilePath);
   // Update Azure devops BuildNumber with the new version.
   updateBuildnumberOnAzure(version);
   return version;
 };
 
-const createVersion = (packageJson: any): string => {
+const createVersion = (packageJson: any, stableBranch: string): string => {
   // Get all the needed data
   const buildReason: string = process.env.BUILD_REASON || '';
   let sourceBranch: string = process.env.BUILD_SOURCEBRANCH || '';
@@ -40,9 +75,9 @@ const createVersion = (packageJson: any): string => {
 
   const gitSha = gitCommitHash.slice(0, 8);
   let correctVersion = packageJson.version;
-  // if master use defined version.
+  // if stablebranch use defined version.
   // otherwise create one based on branch and sha
-  if (sourceBranch !== 'refs/heads/master') {
+  if (sourceBranch !== stableBranch) {
     let correctedSourceBranch = sourceBranch.replace(/\//g, "-");
     correctVersion = `${packageJson.version}-${correctedSourceBranch}-${gitSha}`
   }

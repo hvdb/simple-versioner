@@ -4,14 +4,14 @@ import simpleVersioner from './index';
 const spy = jest.spyOn(console, 'log');
 
 
-const setup = (buildReason: string, sourceBranch: string, sourceVersion: string, version: string, filePath?: string) => {
+const setup = (buildReason: string, sourceBranch: string, sourceVersion: string, version: string, parameters?: string[]) => {
     require('fs').__setMockFile(JSON.stringify({ version }));
 
     process.env.BUILD_REASON = buildReason;
     process.env.BUILD_SOURCEBRANCH = sourceBranch;
     process.env.BUILD_SOURCEVERSION = sourceVersion;
-    if(filePath) {
-        process.argv = ['', '', filePath];
+    if (parameters) {
+        process.argv = ['', ''].concat(parameters);
     }
 }
 
@@ -28,6 +28,14 @@ afterEach(() => {
 
 test('Should give back the normal version as build was for master', () => {
     setup('Ci Individual', 'refs/heads/master', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397', '1.0.0');
+
+    const result = simpleVersioner();
+    expect(result).toBe('1.0.0');
+    expect(spy).toHaveBeenCalledWith("##vso[build.updatebuildnumber]1.0.0");
+});
+
+test('Should give back the normal version as build was for same as provided stable branch', () => {
+    setup('Ci Individual', 'refs/heads/main', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397', '1.0.0', ['-b:main']);
 
     const result = simpleVersioner();
     expect(result).toBe('1.0.0');
@@ -52,7 +60,23 @@ test('Should fail because tag already exists', () => {
 });
 
 test('Should handle different file then package.json', () => {
-    setup('Ci Individual', 'refs/heads/master', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397', '1.0.0', 'vss-extension.json');
+    setup('Ci Individual', 'refs/heads/master', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397', '1.0.0', ['vss-extension.json']);
+
+    const result = simpleVersioner();
+    expect(result).toBe('1.0.0');
+    expect(spy).toHaveBeenCalledWith("##vso[build.updatebuildnumber]1.0.0");
+});
+
+test('Should handle different file then package.json when providing different stable branch option 1', () => {
+    setup('Ci Individual', 'refs/heads/main', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397', '1.0.0', ['vss-extension.json', '-b:main']);
+
+    const result = simpleVersioner();
+    expect(result).toBe('1.0.0');
+    expect(spy).toHaveBeenCalledWith("##vso[build.updatebuildnumber]1.0.0");
+});
+
+test('Should handle different file then package.json when providing different stable branch option 2', () => {
+    setup('Ci Individual', 'refs/heads/main', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397', '1.0.0', ['-b:main', 'vss-extension.json']);
 
     const result = simpleVersioner();
     expect(result).toBe('1.0.0');
