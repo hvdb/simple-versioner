@@ -36,6 +36,11 @@ Default stable branch is`master` if you are using a different stable branch you 
 
 `npx simple-versioner -b:main`
 
+### Possible options
+
+`-b:BRANCH` -> Specify a different branch as release branch.  
+`-nu` -> Do not set the buildnumber in azure, only update the version in the provided json file.  
+
 ### Using it in the Azure DevOps pipelines
 
 #### Editor
