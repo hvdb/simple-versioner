@@ -9,6 +9,7 @@ const FILE_TO_VERSION = 'package.json';
 interface Parameters {
   fileToVersion: string;
   stableBranch: string;
+  doNotUpdateBuild: boolean;
 }
 
 /**
@@ -19,6 +20,7 @@ interface Parameters {
 const handleParameters = (): Parameters => {
   let fileToVersion: string = FILE_TO_VERSION;
   let stableBranch: string = STABLE_BRANCH_REFERENCE + STABLE_BRANCH_NAME;
+  let doNotUpdateBuild: boolean = false;
   if (process.argv.length > 2) {
     // There are parameters passed, no check what they are.
     // File passed to version
@@ -26,6 +28,9 @@ const handleParameters = (): Parameters => {
     if (passedFile) {
       fileToVersion = passedFile;
     }
+
+    // Do not update azure buildnumber
+    doNotUpdateBuild = process.argv.find(param => param.includes("-nu")) ? true : false;
 
     // Different stable branch passed
     let passedBranch = process.argv.find(param => param.includes("-b:")) as string;
@@ -37,11 +42,12 @@ const handleParameters = (): Parameters => {
   return {
     fileToVersion,
     stableBranch,
+    doNotUpdateBuild,
   }
 }
 
 const simpleVersioner = (): string => {
-  let { fileToVersion, stableBranch } = handleParameters();
+  let { fileToVersion, stableBranch, doNotUpdateBuild } = handleParameters();
 
   let jsonFilePath = path.join(process.cwd(), fileToVersion);
   const jsonFile = JSON.parse(fs.readFileSync(jsonFilePath).toString());
@@ -57,8 +63,10 @@ const simpleVersioner = (): string => {
   }
   // Update the filetoversion with the new version
   updateJson(version, jsonFile, jsonFilePath);
-  // Update Azure devops BuildNumber with the new version.
-  updateBuildnumberOnAzure(version);
+  // Update Azure devops BuildNumber with the new version, only if -nu is not provided
+  if (!doNotUpdateBuild) {
+    updateBuildnumberOnAzure(version);
+  }
   return version;
 };
 
