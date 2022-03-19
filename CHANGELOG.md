@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 1.1.0 [2022-03-19]
 ### Added
-- Option to generated a version based on date/time. `-mp`
+- Option to generated a version based on date/time. `-mp` 
 
 ## 1.0.1 [2022-03-09]
 ### Added

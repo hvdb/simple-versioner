@@ -42,6 +42,23 @@ test('Should give back the normal version as build was for same as provided stab
     expect(spy).toHaveBeenCalledWith('##vso[build.updatebuildnumber]4.0.0');
 });
 
+test('Should give back the normal version as build was for same as provided stable branch and not send log to azure', () => {
+    setup('Ci Individual', 'refs/heads/main', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397', '4.0.1', ['-b:main', '-nu']);
+
+    const result = simpleVersioner();
+    expect(result).toBe('4.0.1');
+    expect(spy).not.toHaveBeenCalledWith("##vso[build.updatebuildnumber]4.0.1");
+});
+
+test('Should give back the normal version as build was for master and not send log to azure', () => {
+    setup('Ci Individual', 'refs/heads/master', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397', '4.0.1', ['-nu']);
+
+    const result = simpleVersioner();
+    expect(result).toBe('4.0.1');
+    expect(spy).not.toHaveBeenCalledWith("##vso[build.updatebuildnumber]4.010");
+});
+
+
 test('Should give back a version for develop branch', () => {
     setup('Ci Individual', 'refs/heads/develop', '1d2abf44a3b28c5f4385d95b9f3fe83a1af94397', '4.0.1');
 
