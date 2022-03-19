@@ -26,18 +26,18 @@ const handleParameters = (): Parameters => {
   if (process.argv.length > 2) {
     // There are parameters passed, now check what they are.
     // File passed to version
-    let passedFile = process.argv.find(param => param.includes(".json")) as string;
+    let passedFile = process.argv.find(param => param.includes('.json')) as string;
     if (passedFile) {
       fileToVersion = passedFile;
     }
 
     // Do not update azure buildnumber
-    doNotUpdateBuild = process.argv.find(param => param.includes("-nu")) ? true : false;
+    doNotUpdateBuild = process.argv.find(param => param.includes('-nu')) ? true : false;
     // Check if we need to create version that is compatible with vs/az marketplace.
-    updatedVersionForMarketplace = process.argv.find(param => param.includes("-mp")) ? true : false;
+    updatedVersionForMarketplace = process.argv.find(param => param.includes('-mp')) ? true : false;
 
     // Different stable branch passed
-    let passedBranch = process.argv.find(param => param.includes("-b:")) as string;
+    let passedBranch = process.argv.find(param => param.includes('-b:')) as string;
     if (passedBranch) {
       stableBranch = STABLE_BRANCH_REFERENCE + passedBranch.replace('-b:', '');
     }
@@ -95,7 +95,7 @@ const createVersion = (packageJson: any, stableBranch: string, updatedVersionFor
       const date = new Date();
       correctVersion = `${date.getUTCFullYear()}.${date.getUTCMonth() + 1}.${Math.floor(date.getTime() / 1000)}`
     } else {
-      let correctedSourceBranch = sourceBranch.replace(/\//g, "-");
+      let correctedSourceBranch = sourceBranch.replace(/\//g, '-');
       correctVersion = `${packageJson.version}-${correctedSourceBranch}-${gitSha}`
     }
   }
