@@ -10,6 +10,7 @@ interface Parameters {
   fileToVersion: string;
   stableBranch: string;
   doNotUpdateBuild: boolean;
+  updatedVersionForMarketplace: boolean;
 }
 
 /**
@@ -21,19 +22,22 @@ const handleParameters = (): Parameters => {
   let fileToVersion: string = FILE_TO_VERSION;
   let stableBranch: string = STABLE_BRANCH_REFERENCE + STABLE_BRANCH_NAME;
   let doNotUpdateBuild: boolean = false;
+  let updatedVersionForMarketplace: boolean = false;
   if (process.argv.length > 2) {
-    // There are parameters passed, no check what they are.
+    // There are parameters passed, now check what they are.
     // File passed to version
-    let passedFile = process.argv.find(param => param.includes(".json")) as string;
+    let passedFile = process.argv.find(param => param.includes('.json')) as string;
     if (passedFile) {
       fileToVersion = passedFile;
     }
 
     // Do not update azure buildnumber
-    doNotUpdateBuild = process.argv.find(param => param.includes("-nu")) ? true : false;
+    doNotUpdateBuild = process.argv.find(param => param.includes('-nu')) ? true : false;
+    // Check if we need to create version that is compatible with vs/az marketplace.
+    updatedVersionForMarketplace = process.argv.find(param => param.includes('-mp')) ? true : false;
 
     // Different stable branch passed
-    let passedBranch = process.argv.find(param => param.includes("-b:")) as string;
+    let passedBranch = process.argv.find(param => param.includes('-b:')) as string;
     if (passedBranch) {
       stableBranch = STABLE_BRANCH_REFERENCE + passedBranch.replace('-b:', '');
     }
@@ -43,18 +47,19 @@ const handleParameters = (): Parameters => {
     fileToVersion,
     stableBranch,
     doNotUpdateBuild,
+    updatedVersionForMarketplace,
   }
 }
 
 const simpleVersioner = (): string => {
-  let { fileToVersion, stableBranch, doNotUpdateBuild } = handleParameters();
+  let { fileToVersion, stableBranch, doNotUpdateBuild, updatedVersionForMarketplace } = handleParameters();
 
   let jsonFilePath = path.join(process.cwd(), fileToVersion);
   const jsonFile = JSON.parse(fs.readFileSync(jsonFilePath).toString());
 
 
   // Create version based on Azure system variable
-  const version = createVersion(jsonFile, stableBranch);
+  const version = createVersion(jsonFile, stableBranch, updatedVersionForMarketplace);
 
   // Check if version is already released (tag exists)
   if (tagExists(version)) {
@@ -70,7 +75,7 @@ const simpleVersioner = (): string => {
   return version;
 };
 
-const createVersion = (packageJson: any, stableBranch: string): string => {
+const createVersion = (packageJson: any, stableBranch: string, updatedVersionForMarketplace: boolean): string => {
   // Get all the needed data
   const buildReason: string = process.env.BUILD_REASON || '';
   let sourceBranch: string = process.env.BUILD_SOURCEBRANCH || '';
@@ -86,8 +91,13 @@ const createVersion = (packageJson: any, stableBranch: string): string => {
   // if stablebranch use defined version.
   // otherwise create one based on branch and sha
   if (sourceBranch !== stableBranch) {
-    let correctedSourceBranch = sourceBranch.replace(/\//g, "-");
-    correctVersion = `${packageJson.version}-${correctedSourceBranch}-${gitSha}`
+    if (updatedVersionForMarketplace) {
+      const date = new Date();
+      correctVersion = `${date.getUTCFullYear()}.${date.getUTCMonth() + 1}.${Math.floor(date.getTime() / 1000)}`
+    } else {
+      let correctedSourceBranch = sourceBranch.replace(/\//g, '-');
+      correctVersion = `${packageJson.version}-${correctedSourceBranch}-${gitSha}`
+    }
   }
 
   return correctVersion;

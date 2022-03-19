@@ -31,7 +31,7 @@ test('Should give back the normal version as build was for master', () => {
 
     const result = simpleVersioner();
     expect(result).toBe('4.0.0');
-    expect(spy).toHaveBeenCalledWith("##vso[build.updatebuildnumber]4.0.0");
+    expect(spy).toHaveBeenCalledWith('##vso[build.updatebuildnumber]4.0.0');
 });
 
 test('Should give back the normal version as build was for same as provided stable branch', () => {
@@ -39,7 +39,24 @@ test('Should give back the normal version as build was for same as provided stab
 
     const result = simpleVersioner();
     expect(result).toBe('4.0.0');
-    expect(spy).toHaveBeenCalledWith("##vso[build.updatebuildnumber]4.0.0");
+    expect(spy).toHaveBeenCalledWith('##vso[build.updatebuildnumber]4.0.0');
+});
+
+test('Should give back a version for develop branch', () => {
+    setup('Ci Individual', 'refs/heads/develop', '1d2abf44a3b28c5f4385d95b9f3fe83a1af94397', '4.0.1');
+
+    const result = simpleVersioner();
+    expect(result).toBe('4.0.1-refs-heads-develop-1d2abf44');
+    expect(spy).toHaveBeenCalledWith('##vso[build.updatebuildnumber]4.0.1-refs-heads-develop-1d2abf44');
+});
+
+test('Should give back a version that is compatible for vs/az marketplace for develop branch', () => {
+    setup('Ci Individual', 'refs/heads/develop', '1d2abf44a3b28c5f4385d95b9f3fe83a1af94397', '4.0.1', ['-mp']);
+    const date = new Date();
+    let correctVersion = `${date.getUTCFullYear()}.${date.getUTCMonth() + 1}.${Math.floor(date.getTime() / 1000)}`;
+    const result = simpleVersioner();
+    expect(result).toBe(correctVersion);
+    expect(spy).toHaveBeenCalledWith(`##vso[build.updatebuildnumber]${correctVersion}`);
 });
 
 test('Should give back the normal version as build was for same as provided stable branch and not send log to azure', () => {
@@ -47,7 +64,7 @@ test('Should give back the normal version as build was for same as provided stab
 
     const result = simpleVersioner();
     expect(result).toBe('4.0.1');
-    expect(spy).not.toHaveBeenCalledWith("##vso[build.updatebuildnumber]4.0.1");
+    expect(spy).not.toHaveBeenCalledWith('##vso[build.updatebuildnumber]4.0.1');
 });
 
 test('Should give back the normal version as build was for master and not send log to azure', () => {
@@ -55,19 +72,36 @@ test('Should give back the normal version as build was for master and not send l
 
     const result = simpleVersioner();
     expect(result).toBe('4.0.1');
-    expect(spy).not.toHaveBeenCalledWith("##vso[build.updatebuildnumber]4.010");
+    expect(spy).not.toHaveBeenCalledWith('##vso[build.updatebuildnumber]4.0.1');
 });
 
+test('Should give back a version that is compatible for vs/az marketplace for develop branch and not send log to azure', () => {
+    setup('Ci Individual', 'refs/heads/develop', '1d2abf44a3b28c5f4385d95b9f3fe83a1af94397', '4.0.1', ['-nu', '-mp']);
+    const date = new Date();
+    let correctVersion = `${date.getUTCFullYear()}.${date.getUTCMonth() + 1}.${Math.floor(date.getTime() / 1000)}`;
+    const result = simpleVersioner();
+    expect(result).toBe(correctVersion);
+    expect(spy).not.toHaveBeenCalledWith(`##vso[build.updatebuildnumber]${correctVersion}`);
+});
 
-test('Should give back a version for develop branch', () => {
-    setup('Ci Individual', 'refs/heads/develop', '1d2abf44a3b28c5f4385d95b9f3fe83a1af94397', '4.0.1');
+test('Should give back the normal version as build was for same as provided stable branch and not send log to azure', () => {
+    setup('Ci Individual', 'refs/heads/main', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397', '4.0.1', ['-b:main', '-nu']);
 
     const result = simpleVersioner();
-    expect(result).toBe('4.0.1-refs-heads-develop-1d2abf44');
+    expect(result).toBe('4.0.1');
+    expect(spy).not.toHaveBeenCalledWith('##vso[build.updatebuildnumber]4.0.1');
+});
+
+test('Should give back the normal version as build was for master and not send log to azure', () => {
+    setup('Ci Individual', 'refs/heads/master', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397', '4.0.1', ['-nu']);
+
+    const result = simpleVersioner();
+    expect(result).toBe('4.0.1');
+    expect(spy).not.toHaveBeenCalledWith('##vso[build.updatebuildnumber]4.0.1');
 });
 
 test('Should fail because tag already exists', () => {
-    setup('Ci Individual', 'refs/heads/master', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397', '0.0.1');
+    setup('Ci Individual', 'refs/heads/master', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397', '4.0.1-refs-heads-develop-1d2abf44');
 
     try {
         simpleVersioner();
@@ -81,7 +115,7 @@ test('Should handle different file then package.json', () => {
 
     const result = simpleVersioner();
     expect(result).toBe('4.0.0');
-    expect(spy).toHaveBeenCalledWith("##vso[build.updatebuildnumber]4.0.0");
+    expect(spy).toHaveBeenCalledWith('##vso[build.updatebuildnumber]4.0.0');
 });
 
 test('Should handle different file then package.json when providing different stable branch option 1', () => {
@@ -89,7 +123,7 @@ test('Should handle different file then package.json when providing different st
 
     const result = simpleVersioner();
     expect(result).toBe('4.0.0');
-    expect(spy).toHaveBeenCalledWith("##vso[build.updatebuildnumber]4.0.0");
+    expect(spy).toHaveBeenCalledWith('##vso[build.updatebuildnumber]4.0.0');
 });
 
 test('Should handle different file then package.json when providing different stable branch option 2', () => {
@@ -97,5 +131,5 @@ test('Should handle different file then package.json when providing different st
 
     const result = simpleVersioner();
     expect(result).toBe('4.0.0');
-    expect(spy).toHaveBeenCalledWith("##vso[build.updatebuildnumber]4.0.0");
+    expect(spy).toHaveBeenCalledWith('##vso[build.updatebuildnumber]4.0.0');
 });

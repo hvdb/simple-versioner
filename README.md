@@ -40,6 +40,7 @@ Default stable branch is`master` if you are using a different stable branch you 
 
 `-b:BRANCH` -> Specify a different branch as release branch.  
 `-nu` -> Do not set the buildnumber in azure, only update the version in the provided json file.  
+`-mp` -> When specified the generate version will be based on the date and time. ie: `2022.3.1647715987`
 
 ### Using it in the Azure DevOps pipelines
 
@@ -60,6 +61,7 @@ npx simple-versioner
 
 ## How it works
 
+### Default behavior
 When it is a stable build:
 If the build is for the specified stable branch, the version would be left as is.  
 It will check if there are tags available with the specified version, if so it will throw an error stating that the version is already released. The build will then stop.  
@@ -75,7 +77,18 @@ note: `/` provided in the branchname are replaced by `-`
 PR's are also handled and the correct branch and commitHash is used.
 
 What happens in azure:   
-The `Build.Buildnumber` will be update to the version needed. The build name will then be changed to that version instead of predefined name.
+The `Build.Buildnumber` will be update to the version needed. The build name will then be changed to that version instead of predefined name.  
+_Note: You can suppress this by providing the `-nu` option._  
+
+### Alternative
+When providing the `-mp` option a version based on the date/time will be generated for non release branches.  
+Used format: `yy:MM:time` The time is generated based on `date.getTime()` divide by 1000 and the rounded with `Math.floor`  
+The check if the version (provided in your json file) is still executed.  
+The buildnumber will also be updated, when nor suppressed.  
+
+This is usefull for when you are developing a VScode and/or Azure devops extension. 
+As the marketplaces does not support prerelease version. 
+_(hence the `-mp` name :))_
 
 ## Contributing
 
