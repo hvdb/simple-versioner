@@ -41,6 +41,7 @@ Default stable branch is`master` if you are using a different stable branch you 
 `-b:BRANCH` -> Specify a different branch as release branch.  
 `-nu` -> Do not set the buildnumber in azure, only update the version in the provided json file.  
 `-mp` -> When specified the generate version will be based on the date and time. ie: `2022.3.1647715987`
+`-ntc` -> No Tag Check, when passed it will not throw an error if the tag already exists. Handy when you need to recreate the version later on in the build process. Or don't care about tag already exists.
 
 ### Using it in the Azure DevOps pipelines
 
@@ -64,7 +65,8 @@ npx simple-versioner
 ### Default behavior
 When it is a stable build:
 If the build is for the specified stable branch, the version would be left as is.  
-It will check if there are tags available with the specified version, if so it will throw an error stating that the version is already released. The build will then stop.  
+It will check if there are tags available with the specified version, if so it will throw an error  stating that the version is already released. The build will then stop.   
+*Unless the `-ntc` option is provided. Then this check if not done.*
 
 When it is a feature build:
 - version: 1.0.0

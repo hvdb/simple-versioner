@@ -11,6 +11,7 @@ interface Parameters {
   stableBranch: string;
   doNotUpdateBuild: boolean;
   updatedVersionForMarketplace: boolean;
+  validateTagExists: boolean;
 }
 
 /**
@@ -23,6 +24,8 @@ const handleParameters = (): Parameters => {
   let stableBranch: string = STABLE_BRANCH_REFERENCE + STABLE_BRANCH_NAME;
   let doNotUpdateBuild: boolean = false;
   let updatedVersionForMarketplace: boolean = false;
+  let validateTagExists: boolean = true;
+
   if (process.argv.length > 2) {
     // There are parameters passed, now check what they are.
     // File passed to version
@@ -36,6 +39,8 @@ const handleParameters = (): Parameters => {
     // Check if we need to create version that is compatible with vs/az marketplace.
     updatedVersionForMarketplace = process.argv.find(param => param.includes('-mp')) ? true : false;
 
+    // Check if we need to skip tag already exists vaidation
+    validateTagExists = process.argv.find(param => param.includes('-ntc')) ? false : true;
     // Different stable branch passed
     let passedBranch = process.argv.find(param => param.includes('-b:')) as string;
     if (passedBranch) {
@@ -48,21 +53,21 @@ const handleParameters = (): Parameters => {
     stableBranch,
     doNotUpdateBuild,
     updatedVersionForMarketplace,
+    validateTagExists,
   }
 }
 
 const simpleVersioner = (): string => {
-  let { fileToVersion, stableBranch, doNotUpdateBuild, updatedVersionForMarketplace } = handleParameters();
+  let { fileToVersion, stableBranch, doNotUpdateBuild, updatedVersionForMarketplace, validateTagExists } = handleParameters();
 
   let jsonFilePath = path.join(process.cwd(), fileToVersion);
   const jsonFile = JSON.parse(fs.readFileSync(jsonFilePath).toString());
 
-
   // Create version based on Azure system variable
   const version = createVersion(jsonFile, stableBranch, updatedVersionForMarketplace);
 
-  // Check if version is already released (tag exists)
-  if (tagExists(version)) {
+  // Check if version is already released (tag exists), only if needed
+  if (validateTagExists && tagExists(version)) {
     // Exit with a non success code as we should not release.
     throw new Error(`Version ${version} is already released, please update ${fileToVersion} to a newer version`);
   }
