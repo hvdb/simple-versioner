@@ -95,7 +95,7 @@ const createVersion = (packageJson: any, stableBranch: string, updatedVersionFor
   let correctVersion = packageJson.version;
   // if stablebranch use defined version.
   // otherwise create one based on branch and sha
-  if (sourceBranch !== stableBranch) {
+  if (sourceBranch && stableBranch && sourceBranch !== stableBranch) {
     if (updatedVersionForMarketplace) {
       const date = new Date();
       correctVersion = `${date.getUTCFullYear()}.${date.getUTCMonth() + 1}.${Math.floor(date.getTime() / 1000)}`
