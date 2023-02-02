@@ -24,7 +24,8 @@ steps:
   displayName: 'npm test'  
  
 - script: |
-    npx -y simple-versioner
+    npm install -g simple-versioner
+    simple-versioner
   displayName: 'Get and set correct build version'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   
