@@ -101,13 +101,22 @@ test('Should give back the normal version as build was for master and not send l
 });
 
 test('Should fail because tag already exists', () => {
-    setup('Ci Individual', 'refs/heads/master', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397', '4.0.1-refs-heads-develop-1d2abf44');
+    setup('Ci Individual', 'refs/heads/master', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397', '0.0.1');
 
     try {
-        simpleVersioner();
+        const result = simpleVersioner();
     } catch (exception: any) {
         expect(exception.message).toBe('Version 0.0.1 is already released, please update package.json to a newer version');
     }
+});
+
+test('Should not fail if tag already exists when -ntc is passed', () => {
+    setup('Ci Individual', 'refs/heads/master', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397', '0.0.1', ['-ntc']);
+
+    const result = simpleVersioner();
+    expect(result).toBe('0.0.1');
+    expect(spy).toHaveBeenCalledWith('##vso[build.updatebuildnumber]0.0.1');
+
 });
 
 test('Should handle different file then package.json', () => {
