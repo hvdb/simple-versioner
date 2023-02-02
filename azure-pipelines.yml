@@ -23,19 +23,20 @@ steps:
     npm test
   displayName: 'npm test'  
  
-- bash: 'npx simple-versioner'
+- script: |
+    npx simple-versioner
   displayName: 'Get and set correct build version'
-  condition: contains(variables['build.sourceBranch'], 'refs/heads/master')
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   
 - script: |
     npm run build
   displayName: 'npm build'
-  condition: contains(variables['build.sourceBranch'], 'refs/heads/master')
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     
 - script: |
     npm pack
   displayName: 'Package for npm release'
-  condition: contains(variables['build.sourceBranch'], 'refs/heads/master')
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 
 - task: CopyFiles@2
   inputs:
@@ -43,7 +44,7 @@ steps:
     contents: '*.tgz' 
     targetFolder: $(Build.ArtifactStagingDirectory)/npm
   displayName: 'Copy npm package'
-  condition: contains(variables['build.sourceBranch'], 'refs/heads/master')
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 
 - task: CopyFiles@2
   inputs:
@@ -51,11 +52,11 @@ steps:
     contents: 'package.json' 
     targetFolder: $(Build.ArtifactStagingDirectory)/npm
   displayName: 'Copy package.json'
-  condition: contains(variables['build.sourceBranch'], 'refs/heads/master')
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 
 - task: PublishBuildArtifacts@1
   inputs:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)/npm'
     artifactName: npm
   displayName: 'Save npm artifact in azure'
-  condition: contains(variables['build.sourceBranch'], 'refs/heads/master')
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
