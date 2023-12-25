@@ -47,7 +47,11 @@ test('Should fail because tag already exists', () => {
     try {
         simpleVersioner();
     } catch (exception) {
-        expect(exception.message).toBe('Version 0.0.1 is already released, please update package.json to a newer version');
+        let errorMessage = '';
+        if (exception instanceof Error) {
+            errorMessage = exception.message;
+          }
+        expect(errorMessage).toBe('Version 0.0.1 is already released, please update package.json to a newer version');
     }
 });
 
