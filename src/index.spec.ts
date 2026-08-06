@@ -1,8 +1,8 @@
 jest.mock('fs');
+jest.mock('child_process');
 
 import simpleVersioner from './index';
 const spy = jest.spyOn(console, 'log');
-
 
 const setup = (buildReason: string, sourceBranch: string, sourceVersion: string, version: string, parameters?: string[]) => {
     require('fs').__setMockFile(JSON.stringify({ version }));
@@ -19,6 +19,7 @@ const tearDown = () => {
     delete process.env.BUILD_REASON;
     delete process.env.BUILD_SOURCEBRANCH;
     delete process.env.BUILD_SOURCEVERSION;
+    process.argv = [];
     jest.clearAllMocks();
 }
 
@@ -104,7 +105,7 @@ test('Should fail because tag already exists', () => {
     setup('Ci Individual', 'refs/heads/master', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397', '0.0.1');
 
     try {
-        const result = simpleVersioner();
+        simpleVersioner();
     } catch (exception: any) {
         expect(exception.message).toBe('Version 0.0.1 is already released, please update package.json to a newer version');
     }
@@ -139,6 +140,15 @@ test('Should handle different file then package.json when providing different st
     setup('Ci Individual', 'refs/heads/main', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94397', '4.0.0', ['-b:main', 'vss-extension.json']);
 
     const result = simpleVersioner();
+    expect(result).toBe('4.0.0');
+    expect(spy).toHaveBeenCalledWith('##vso[build.updatebuildnumber]4.0.0');
+});
+
+test('Should format with prettier if it is installed and a config can be found for target file', () => {
+    setup('Ci Individual', 'refs/heads/master', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94392', '4.0.0');
+
+    const result = simpleVersioner();
+    expect(spy).toHaveBeenCalledWith('We formatted!!');
     expect(result).toBe('4.0.0');
     expect(spy).toHaveBeenCalledWith('##vso[build.updatebuildnumber]4.0.0');
 });
