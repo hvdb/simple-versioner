@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'node:path';
-import { execSync } from 'child_process';
+import { modify, applyEdits } from 'jsonc-parser';
 import tagExists from './git';
 
 const STABLE_BRANCH_NAME = 'master';
@@ -62,7 +62,8 @@ const simpleVersioner = (): string => {
   let { fileToVersion, stableBranch, doNotUpdateBuild, updatedVersionForMarketplace, validateTagExists } = handleParameters();
 
   let jsonFilePath = path.join(process.cwd(), fileToVersion);
-  const jsonFile = JSON.parse(fs.readFileSync(jsonFilePath).toString());
+  const jsonFileContent = fs.readFileSync(jsonFilePath).toString();
+  const jsonFile = JSON.parse(jsonFileContent);
 
   // Create version based on Azure system variable
   const version = createVersion(jsonFile, stableBranch, updatedVersionForMarketplace);
@@ -73,7 +74,7 @@ const simpleVersioner = (): string => {
     throw new Error(`Version ${version} is already released, please update ${fileToVersion} to a newer version`);
   }
   // Update the filetoversion with the new version
-  updateJson(version, jsonFile, jsonFilePath);
+  updateJson(version, jsonFileContent, jsonFilePath);
   // Update Azure devops BuildNumber with the new version, only if -nu is not provided
   if (!doNotUpdateBuild) {
     updateBuildnumberOnAzure(version);
@@ -109,39 +110,21 @@ const createVersion = (packageJson: any, stableBranch: string, updatedVersionFor
   return correctVersion;
 }
 
-const updateJson = (version: string, jsonFile: any, filePath: string): void => {
-  jsonFile.version = version;
-  fs.writeFileSync(filePath, JSON.stringify(jsonFile, null, 4));
-  if (shouldRunPrettier(filePath)) {
-    // log it, actually useful if the user is aware that prettier was ran on the file that we updated
-    console.log(execSync(`npx prettier --list-different --write ${filePath}`).toString())
-  }
+/**
+ * Update the json file without reserializing/reformatting it
+ * This method is similar to how VSCode internally does this to settings.json files
+ */
+const updateJson = (version: string, jsonFileContent: string, filePath: string): void => {
+  const edits = modify(jsonFileContent, ['version'], version, {
+    formattingOptions: {} // leave empty; it infers from context for this edit
+  });
+  const updated = applyEdits(jsonFileContent, edits);
+  fs.writeFileSync(filePath, updated);
 }
 
 const updateBuildnumberOnAzure = (version: string): void => {
   // log to output so that azure can use it
   console.log(`##vso[build.updatebuildnumber]${version}`);
-}
-
-/**
- * We're making a change to the JSON file -> version field
- * If Prettier is installed and a prettier config is available for the JSON file, then we should run prettier on the JSON file to ensure
- * that we don't suddenly cause a failing CI because the package.json is no longer formatted properly.
- */
-const shouldRunPrettier = (filePath: string) => {
-  const isPrettierInstalled = !!execSync('npm ls -p prettier').toString().trim();
-  if (isPrettierInstalled) {
-    let prettierConfigExists = true;
-    try {
-      // hide logs
-      execSync(`npx prettier --find-config-path ${filePath}`, {stdio : 'pipe' })
-    } catch (e) {
-      // command will fail if no config can be found that would be used to format the package.json
-      prettierConfigExists = false;
-    }
-    return prettierConfigExists;
-  }
-  return false;
 }
 
 export default simpleVersioner;

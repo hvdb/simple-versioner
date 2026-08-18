@@ -4,8 +4,8 @@ jest.mock('child_process');
 import simpleVersioner from './index';
 const spy = jest.spyOn(console, 'log');
 
-const setup = (buildReason: string, sourceBranch: string, sourceVersion: string, version: string, parameters?: string[]) => {
-    require('fs').__setMockFile(JSON.stringify({ version }));
+const setup = (buildReason: string, sourceBranch: string, sourceVersion: string, version: string, parameters?: string[], indents?: number) => {
+    require('fs').__setMockFile(JSON.stringify({ version }, null, indents ?? 0));
 
     process.env.BUILD_REASON = buildReason;
     process.env.BUILD_SOURCEBRANCH = sourceBranch;
@@ -144,11 +144,12 @@ test('Should handle different file then package.json when providing different st
     expect(spy).toHaveBeenCalledWith('##vso[build.updatebuildnumber]4.0.0');
 });
 
-test('Should format with prettier if it is installed and a config can be found for target file', () => {
-    setup('Ci Individual', 'refs/heads/master', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94392', '4.0.0');
-
+test('Should respect original formatting of the file it sets the version to', () => {
+    setup('Ci Individual', 'refs/heads/master', '1c2abf44a3b28c5f4385d95b9f3fe83a1af94392', '4.0.0', undefined, 123);
     const result = simpleVersioner();
-    expect(spy).toHaveBeenCalledWith('We formatted!!');
     expect(result).toBe('4.0.0');
     expect(spy).toHaveBeenCalledWith('##vso[build.updatebuildnumber]4.0.0');
+    // our mocked readFileSync will return the mockFile that simple-versioner wrote to
+    // the indents should be 123 still.
+    expect(require('fs').readFileSync('')).toBe(JSON.stringify({ version: '4.0.0' }, null, 123))
 });

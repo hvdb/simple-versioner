@@ -11,6 +11,7 @@ function readFileSync(filePath: string | number) {
 }
 
 function writeFileSync(path: string | number, data: any, options?: object): void{
+    mockFile = data;
 }
 
 
